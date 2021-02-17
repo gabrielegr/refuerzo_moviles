@@ -1,6 +1,7 @@
 package com.example.myapplication.data.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -17,6 +18,9 @@ interface PokemonDao {
 
     @Query(  "SELECT * FROM pokemon_table")
     fun findAll() : LiveData<List<Pokemon>>
+
+    @Query ("SELECT * FROM pokemon_table")
+    fun getSource(): PagingSource<Int,Pokemon>
 
     @Query( "DELETE  FROM pokemon_table WHERE id = :id")
     fun delete(id: Int)

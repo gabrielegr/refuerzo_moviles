@@ -5,13 +5,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.myapplication.data.dao.PokemonDao
+import com.example.myapplication.data.dao.RemoteKeyDao
 import com.example.myapplication.data.entity.Pokemon
+import com.example.myapplication.data.entity.RemoteKey
 
 
-@Database(entities = [Pokemon::class], version = 1, exportSchema = false)
+@Database(entities = [Pokemon::class, RemoteKey::class], version = 1, exportSchema = false)
 abstract class PokemonDataBase : RoomDatabase() {
 
     abstract fun pokemonDao() : PokemonDao
+
+    abstract fun RemoteKeyDao() : RemoteKeyDao
 
     companion object{
         @Volatile

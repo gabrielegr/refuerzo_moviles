@@ -6,18 +6,37 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.data.entity.PokePageAdapter
 import com.example.myapplication.data.entity.Pokemon
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModelFactory by lazy {
         val myApplication = application as MyApplication
         val pokemonRepository = myApplication.pokemonRepository
-        MainViewModelFactory(pokemonRepository)
+        val database = myApplication.database
+        MainViewModelFactory(pokemonRepository, database)
     }
 
     private val viewModel : MainViewModel by viewModels {
        viewModelFactory
+    }
+
+    object PokemonComparator : DiffUtil.ItemCallback<Pokemon>(){
+        override fun areItemsTheSame(oldItem: Pokemon, newItem: Pokemon): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Pokemon, newItem: Pokemon): Boolean {
+            return oldItem == newItem
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +50,16 @@ class MainActivity : AppCompatActivity() {
             nameView.text = it.name
         }
 
+val recyclerView = findViewById<RecyclerView>(R.id.reycler_pokemon_list)
+        val adapter = PokePageAdapter(PokemonComparator)
 
+        recyclerView.adapter = adapter
+        lifecycleScope.launch{
+            viewModel.pager.flow.collectLatest { pokemonPageSources ->
+                adapter.submitData(pokemonPageSources)
+
+            }
+        }
     }
 
     fun onFindPokemon(){
